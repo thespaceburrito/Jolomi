@@ -18,8 +18,17 @@ function parseOurPlaylist() {
 		songs.push(playlist.slice((offset+0),(offset+12)));
 	}
 
-	for (let i = 0; i < songs.length; i++) {
-		alert(songs[i]);
-	}
-	
+	fillListWithSongs(songs);
+}
+
+function fillListWithSongs(songs) {
+	let tbody = document.querySelector("#container__item2_tbody");
+	let songtemplate = document.querySelector("#songrow");
+
+	songs.forEach(function(song){
+		let newItem = songtemplate.content.cloneNode(true);
+		newItem.querySelector("#songrow__name").textContent = song;
+
+		tbody.appendChild(newItem);
+	});
 }

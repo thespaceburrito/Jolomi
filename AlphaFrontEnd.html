@@ -21,6 +21,15 @@
           <div class="inner three"></div>
         </div>
 
+	<!-- template doesn't get rendered, but makes it easier to add elements with DOM -->
+	<template id="songrow">
+	  <tr>
+	    <td id="songrow__name"></td>
+	    <td id="songrow__artist"></td>
+	    <td id="songrow__duration"></td>
+	  </tr>
+	</template>
+
         <div class="container__item2" id="container__item2" style="overflow-x:auto; display: none;">
           <table class="blue">
             <thead>
@@ -30,7 +39,7 @@
                 <th>Time</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="container__item2_tbody">
               <tr>
                 <td>What Could Have Been feat. Ray Chen (from the series Arcane League of Legends)</td>
                 <td>Sting</td>
@@ -40,8 +49,8 @@
                 <td>Seaching For A Feeling</td>
                 <td>Thirdstory</td>
                 <td>3:49</td>
-              </tr>             
-            </tbody>
+	      </tr>            
+	    </tbody>
           </table>
 
         </div>
