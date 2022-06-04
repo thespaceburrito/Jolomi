@@ -8,7 +8,9 @@ function validateLink(myURL) {
 
 function getLink() {
     if (validateLink(document.getElementById("form__field").value)){
-        Hide("container__item");
+        loadFile();
+
+	Hide("container__item");
         Show("loader");
         setTimeout(function() { Hide("loader"); Show("container__item2");}, 1500);
         
