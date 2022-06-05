@@ -40,7 +40,6 @@ app.get('/', function(req, res){
 // STEP 2: handle a post request to this server that syncronously sends the playlist link over to this script
 // TODO: can't really do anything about this until we have the apple music api keys. For now, it'll just use dummy info
 app.post('/sendplaylistdata', function(req, res){
-    console.log(req.body);
     // I'll have to change this later. This router is going to have to check a database for existing entry, create a .dat file from the apple playlist,
     //              create a database entry linking the url and the .dat file, and then send the randomly generated file name back to the client
     // STEP 3: process the playlist link (if playlist exists on server, use the existing data file. if else, create a new data file for that playlist and upload it to the server)
@@ -69,17 +68,30 @@ app.get('/ret', function(req, res){
                     songs.push(playlist.slice((offset+0),(offset+12)));
                 }
                 // now, the array 'songs' has a bunch of separated 12-digit ISRC codes
-                //which we will send to spotify for info
-                songs.forEach(function(song){
-                    spotifyApi.searchTracks('isrc:' + song, {limit: 1}).then(
-                        function(data) {
-                            console.log(data.body.tracks.items[0].name);
-                        },
-                        function(err) {
-                            console.log('Something went wrong!', err);
-                        }
-                    );
-                });
+                // which we will send to spotify for info (and just return the first search result info)
+                let songnames = new Array(songnum);
+                let songpromises = new Array();
+                (async function() {
+                    let i = 0;
+                    songs.forEach(function(song){
+                        let h = i; // manually guarantee correct order given order isn't guaranteed by async api calls
+                        songpromises.push(spotifyApi.searchTracks('isrc:' + song, {limit: 1}).then(
+                            function(data) {
+                                songnames[h] = data.body.tracks.items[0];
+                            },
+                            function(err) {
+                                console.log('Something went wrong!', err);
+                            }
+                        ));
+                        i++;
+                    });
+                    await Promise.all(songpromises);
+                })().then(function(){res.send(songnames)});
+                // async and promises are annoying because I don't understand them yet. I need to delay the return until all spotify api info is gathered together.
+                // Because the api wrapper makes a promise, the return code below this gets sent before the api calls are returned.
+                // So, we get empty, undefined information back. I need to figure out how to wait for all of my calls to finish.
+                // UPDATE: This is doable by wrapping the entire thing in an anonymous async function, collecting the promises in an array, and awaiting the promises, so that this code only gets executed after.
+                // I believe this is all the code we need for this route.
             }
         });
     } catch (e) {}
