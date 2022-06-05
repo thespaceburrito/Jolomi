@@ -13,18 +13,32 @@ function loadFile() {
 		infoRequest.responseType = "json";
 		infoRequest.addEventListener("load", function() {
 			let playlistObj = this.response;
-			//console.log(playlistObj);
+			console.log(playlistObj);
 
 			//i don't need this to be genuinely good or separate or organized, I'm just going to move it into callback hell and let it suffer there.
 			let tbody = document.querySelector("#container__item2_tbody");
 			let songtemplate = document.querySelector("#songrow");
 
 			playlistObj.forEach(function(song){
-				let newItem = songtemplate.content.cloneNode(true);
-				newItem.querySelector("#songrow__name").textContent = song.name;
-				newItem.querySelector("#songrow__artist").textContent = song.artists[0].name;
-				newItem.querySelector("#songrow__duration").textContent = millisToMinutesAndSeconds(song.duration_ms);
-				tbody.appendChild(newItem);
+				if (song != null) {
+					let newItem = songtemplate.content.cloneNode(true);
+					//song name and link
+					newItem.querySelector("#songrow__name").textContent = song.name;
+					newItem.querySelector("#songrow__name").href = song.external_urls.spotify;
+					
+					//artist name and link
+					artistName = new Array();
+					song.artists.forEach(function(data){
+						artistName.push(data.name);
+					});
+					newItem.querySelector("#songrow__artist").textContent = artistName.join(", ");
+					newItem.querySelector("#songrow__artist").href = song.artists[0].external_urls.spotify;
+
+					//song duration in m:ss format
+					newItem.querySelector("#songrow__duration").textContent = millisToMinutesAndSeconds(song.duration_ms);
+					
+					tbody.appendChild(newItem);
+				}
 			});
 
 		});

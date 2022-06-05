@@ -44,7 +44,7 @@ app.post('/sendplaylistdata', function(req, res){
     //              create a database entry linking the url and the .dat file, and then send the randomly generated file name back to the client
     // STEP 3: process the playlist link (if playlist exists on server, use the existing data file. if else, create a new data file for that playlist and upload it to the server)
     
-    res.status(201).send("testlist"); // send dummy file back to client so they can query from our spotify router
+    res.status(201).send("roadsongs"); // send dummy file back to client so they can query from our spotify router
 });
 
 
