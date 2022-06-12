@@ -8,7 +8,7 @@ $button-text-color: #fff;
 
 //** root
 :root {
-  background: #79CDCD;
+  background: linear-gradient(45deg, #49a09d, #5f2c82);;
   color: $text;
   font: 1rem "PT Sans", sans-serif;
 }
@@ -23,9 +23,13 @@ body{
   margin: 0;
 }
 
+
+
 a {
   color: inherit;
-  
+  &:link{
+    text-decoration: none;
+  }
   &:hover {
     color: $button-bg-color;
   }
@@ -37,6 +41,7 @@ a {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100%;
 }
 
 #error {
@@ -99,38 +104,80 @@ a {
 //table
 
 table{
-  border-collapse:collapse;
-  width:100%;
-  color: #000;
-  //background: #fff;
-  box-shadow: 0 6px 10px 0 rgba(0, 0, 0 , .1);
-  border: 0;
-  outline: 0;
-  padding: 22px 18px;
+  width: 800px;
+	border-collapse: collapse;
+	box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  //overflow: hidden;
 }
 
 th,td{
   text-align:left;
-  padding:20px ;
   word-wrap: normal;
-  max-width: 150 px;
+  padding: 15px;
+	background-color: rgba(255,255,255,0.2);
+	color: #fff;
  
 }
 
 th {
-  opacity:1 !important;
+  text-align: left;
 }
 
-tr {
-  border-bottom: #000;
-  border-bottom-style: solid;
-  border-bottom-width: thin;
-  opacity:0.5;
+thead {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: #fff;
+  th {
+		background-color: #55608f;
+	}
 }
 
-tbody tr:hover{
-  opacity:1;
-  }
+tbody {
+	tr {
+		&:hover {
+			background-color: rgba(255,255,255,0.3);
+		}
+	}
+	/*td {
+		position: relative;
+		&:hover {
+			&:before {
+				content: "";
+				position: absolute;
+				left: 0;
+				right: 0;
+				top: -9999px;
+				bottom: -9999px;
+				background-color: rgba(255,255,255,0.2);
+				z-index: -1;
+			}
+		}
+	}*/
+}
+
+/* custom scrollbar */
+::-webkit-scrollbar {
+  width: 20px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #d6dee1;
+  border-radius: 20px;
+  border: 6px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #a8bbbf;
+}
+
+
+
 
   //loader
   .loader {
