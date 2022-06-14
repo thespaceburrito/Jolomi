@@ -56,8 +56,6 @@ app.get('/ret', function(req, res){
             if (err) {
                 res.send("bad request, no such playlist");        
             } else {
-                // in here, we can parse the data in this file and then get the information for each song to send back in a responsefunction parseOurPlaylist() {
-                
                 // parse the data file into separate ISRC codes
                 let len = playlist.length;
                 let songnum = (~~(len/12));
@@ -68,7 +66,6 @@ app.get('/ret', function(req, res){
                     songs.push(playlist.slice((offset+0),(offset+12)));
                 }
                 // now, the array 'songs' has a bunch of separated 12-digit ISRC codes
-                // which we will send to spotify for info (and just return the first search result info)
                 let songnames = new Array(songnum);
                 let songpromises = new Array();
                 (async function() {
@@ -87,11 +84,6 @@ app.get('/ret', function(req, res){
                     });
                     await Promise.all(songpromises);
                 })().then(function(){res.send(songnames)});
-                // async and promises are annoying because I don't understand them yet. I need to delay the return until all spotify api info is gathered together.
-                // Because the api wrapper makes a promise, the return code below this gets sent before the api calls are returned.
-                // So, we get empty, undefined information back. I need to figure out how to wait for all of my calls to finish.
-                // UPDATE: This is doable by wrapping the entire thing in an anonymous async function, collecting the promises in an array, and awaiting the promises, so that this code only gets executed after.
-                // I believe this is all the code we need for this route.
             }
         });
     } catch (e) {}
