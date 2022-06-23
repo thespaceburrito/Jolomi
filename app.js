@@ -3,12 +3,46 @@ const fs = require("fs");
 const express = require("express");
 const app = express();
 
+function getCurrentTime() {
+	var today = new Date();
+	return ((today.getHours()*3600)+(today.getMinutes()*60)+today.getSeconds());
+}
+
+class Token {
+	constructor(a, b) {
+		this.accessToken = a;
+		this.lifetime = b;
+		this.timeCreated = getCurrentTime();
+	}
+
+	checkAccessToken = () => {
+		if(this.timeCreated + (this.lifetime - 20) <= getCurrentTime()) {
+			console.log("check failed, respawning clientCredentialsGrant");
+			spotifyApi.clientCredentialsGrant().then((data) => {
+        			console.log('The new access token expires in ' + data.body['expires_in']);
+        			console.log('The new access token is ' + data.body['access_token']);
+        			spotifyApi.setAccessToken(data.body['access_token']);
+				this.access_token = data.body['access_token'];
+				this.lifetime = data.body['expires_in']);
+				this.timeCreated = getCurrentTime();
+    			}, function(err) {
+        			console.log('Something went wrong when retrieving an access token', err);
+    			});
+		} else {
+			console.log("check passed");
+		}
+	}
+}
+
+
+
 const SpotifyWebApi = require('spotify-web-api-node');
 var spotifyApi = new SpotifyWebApi({
     clientId: '546109c180e642bb8c373e57baf8bd00',
     clientSecret: 'ce1ae5826d724936b9c4364e47951127',
     redirectUri: 'http://localhost:8888/callback'
 });
+
 
 // Retrieve an access token from spotify's api.
 spotifyApi.clientCredentialsGrant().then(
@@ -17,6 +51,7 @@ spotifyApi.clientCredentialsGrant().then(
         console.log('The access token is ' + data.body['access_token']);
         // Save the access token so that it's used in future calls
         spotifyApi.setAccessToken(data.body['access_token']);
+	this.ourToken = new Token(data.body['access_token'], data.body['expires_in']);
     },
     function(err) {
         console.log('Something went wrong when retrieving an access token', err);
@@ -35,6 +70,7 @@ app.use(express.static(__dirname + '/app'));
 // STEP 1: render the default page at root url -- DONE
 app.get('/', function(req, res){
     res.render('defaultView.ejs');
+    
 });
 
 // STEP 2: handle a post request to this server that syncronously sends the playlist link over to this script
@@ -43,7 +79,9 @@ app.post('/sendplaylistdata', function(req, res){
     // I'll have to change this later. This router is going to have to check a database for existing entry, create a .dat file from the apple playlist,
     //              create a database entry linking the url and the .dat file, and then send the randomly generated file name back to the client
     // STEP 3: process the playlist link (if playlist exists on server, use the existing data file. if else, create a new data file for that playlist and upload it to the server)
-    
+    //TEST
+    this.ourToken.checkAccessToken();
+
     res.status(201).send("roadsongs"); // send dummy file back to client so they can query from our spotify router
 });
 
