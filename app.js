@@ -23,7 +23,7 @@ class Token {
         			console.log('The new access token is ' + data.body['access_token']);
         			spotifyApi.setAccessToken(data.body['access_token']);
 				this.access_token = data.body['access_token'];
-				this.lifetime = data.body['expires_in']);
+				this.lifetime = data.body['expires_in'];
 				this.timeCreated = getCurrentTime();
     			}, function(err) {
         			console.log('Something went wrong when retrieving an access token', err);
@@ -116,7 +116,7 @@ app.get('/ret', function(req, res){
                             },
                             function(err) {
                                 console.log('Something went wrong!', err);
-                            }
+			    }
                         ));
                         i++;
                     });
