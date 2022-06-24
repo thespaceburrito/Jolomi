@@ -5,8 +5,10 @@ const app = express();
 
 function getCurrentTime() {
 	var today = new Date();
-	return ((today.getHours()*3600)+(today.getMinutes()*60)+today.getSeconds());
+	return ((today.getDate()*86400)+(today.getHours()*3600)+(today.getMinutes()*60)+today.getSeconds());
 }
+
+var isApiReady = false;
 
 class Token {
 	constructor(a, b) {
@@ -17,20 +19,26 @@ class Token {
 
 	checkAccessToken = () => {
 		if(this.timeCreated + (this.lifetime - 20) <= getCurrentTime()) {
-			console.log("check failed, respawning clientCredentialsGrant");
-			spotifyApi.clientCredentialsGrant().then((data) => {
-        			console.log('The new access token expires in ' + data.body['expires_in']);
-        			console.log('The new access token is ' + data.body['access_token']);
-        			spotifyApi.setAccessToken(data.body['access_token']);
-				this.access_token = data.body['access_token'];
-				this.lifetime = data.body['expires_in'];
-				this.timeCreated = getCurrentTime();
-    			}, function(err) {
-        			console.log('Something went wrong when retrieving an access token', err);
-    			});
+			isApiReady = false;
+			this.respawnAccessToken();	
 		} else {
 			console.log("check passed");
 		}
+	}
+
+	respawnAccessToken() {
+		console.log("check failed, respawning clientCredentialsGrant");
+		spotifyApi.clientCredentialsGrant().then((data) => {
+        		console.log('The new access token expires in ' + data.body['expires_in']);
+        		console.log('The new access token is ' + data.body['access_token']);
+        		spotifyApi.setAccessToken(data.body['access_token']);
+			this.access_token = data.body['access_token'];
+			this.lifetime = data.body['expires_in'];
+			this.timeCreated = getCurrentTime();
+			isApiRead = true;
+    		}, function(err) {
+        		console.log('Something went wrong when retrieving an access token', err);
+    		});
 	}
 }
 
@@ -52,6 +60,7 @@ spotifyApi.clientCredentialsGrant().then(
         // Save the access token so that it's used in future calls
         spotifyApi.setAccessToken(data.body['access_token']);
 	this.ourToken = new Token(data.body['access_token'], data.body['expires_in']);
+	isApiReady = true;
     },
     function(err) {
         console.log('Something went wrong when retrieving an access token', err);
@@ -89,6 +98,7 @@ app.post('/sendplaylistdata', function(req, res){
 // STEP 4: process the data file via spotify's api, getting the name, artist, and duration of each song and sending them back to AlphaFrontEnd.js to populate the page.
 app.get('/ret', function(req, res){
     let linkToData = req.query.linktodata;
+    while(!isApiReady) {}
     try {
         fs.readFile('./usrdata/lists/' + linkToData + '.dat', function(err, playlist){
             if (err) {
@@ -96,7 +106,7 @@ app.get('/ret', function(req, res){
             } else {
                 // parse the data file into separate ISRC codes
                 let len = playlist.length;
-                let songnum = (~~(len/12));
+	        let songnum = (~~(len/12));
                 let songs = new Array();
 
                 for (let i=0; i<songnum; i++) {
@@ -115,7 +125,7 @@ app.get('/ret', function(req, res){
                                 songnames[h] = data.body.tracks.items[0];
                             },
                             function(err) {
-                                console.log('Something went wrong!', err);
+                                //console.log('Something went wrong!', err);
 			    }
                         ));
                         i++;
