@@ -1,0 +1,19 @@
+{
+    "_id": "provided by mongodb on document creation",
+    "applemusic_url": "[INDEX THIS] String -- link to apple music playlist provided that generated this entry",
+    "name": "String -- name of playlist",
+    "songs": [
+        {
+            "isrc": "String -- twelve(i think?) character code to uniquely identify songs",
+            "name": "String -- name of song",
+            "artists": [
+                {
+                    "name": "String -- name of artist",
+                    "link": "String -- artist spotify page URL"
+                }
+            ],
+            "duration": "Int -- duration of song in milliseconds",
+            "cover": "String -- link to song's cover image"
+        }
+    ]
+}

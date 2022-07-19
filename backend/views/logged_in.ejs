@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>        
+        <!-- Metadata for SEO -->
+        <meta charset="utf-8">
+        <meta name="author" content="Andrew Robinson">
+        <meta name="Description" content="Creatively Named Playlist Converter -- backend testing">
+
+        <script>
+            sessionStorage.clear();
+
+            async function getPlaylistInfo() {
+                let link = document.getElementById("link").value;
+                let request = await fetch(`/api/commonplaylistobject?playlistlink=${link}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json', }
+                });
+
+                if(request.status != '200') {
+                    alert("could not get commonplaylistobject from link");
+                    return;
+                }
+                let res = await request.json();
+                document.getElementById('playlistinfo').innerHTML = JSON.stringify(res);
+                sessionStorage.setItem('commonplaylistobject', JSON.stringify(res));
+                document.getElementById('addtospotify').disabled = false;
+            }
+
+            async function addToSpotify() {
+                let requestBody = {
+                    commonplaylistobject: JSON.parse(sessionStorage.getItem('commonplaylistobject')),
+                    name: "test playlist",
+                    public: false,
+                    description: "test of creatively named playlist converter /api/spotifyplaylist endpoint"
+                };
+
+                let request = await fetch(`/api/spotifyplaylist`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', },
+                    body: JSON.stringify(requestBody)
+                });
+
+                let res = await request.json();
+                if(res.status != 201) {
+                    alert("An error occurred while adding playlist to your spotify library: " + res);
+                    return;
+                }
+                alert("Successfully added playlist to your spotify account.");                
+            }
+        </script>
+
+
+        <title>Creatively Named Playlist Converter -- backend testing</title>
+    </head>
+    <body>
+        You are logged in with spotify.
+        <br>
+        Please provide a link to an apple music playlist.
+        <input type="text" id="link" placeholder="Apple music link"/>
+        <input type="button" value="submit" onclick="getPlaylistInfo()">
+        <div id="playlistinfo"></div>
+        <button id="addtospotify" onclick="addToSpotify()" disabled="true">Add to Spotify</button>
+    </body>
+</html>
