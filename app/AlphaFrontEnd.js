@@ -4,19 +4,31 @@ function validateLink(myURL) {
         return pattern.test(myURL);
 }
 
-
-
 function getLink() {
-    if (validateLink(document.getElementById("form__field").value)){
+    if (validateLink(document.getElementById("u-search-input-1").value)){
         loadFile();
-
-	Hide("container__item");
-        Show("loader");
-        setTimeout(function() { Hide("loader"); Show("container__item2");}, 1500);
+        document.getElementById("fittext1").innerText = "Playlist Name";
+    
         
         
     }else{
-        document.getElementById('error').innerHTML = "Please enter a valid playlist url";
+        alert ("Please enter a valid playlist url");  
+    }
+   
+}
+
+function getLink2() {
+    if (validateLink(document.getElementById("u-search-input-2").value)){
+       loadFile();
+       document.getElementById("fittext1").innerText = "Playlist Name";
+       ShowFlex("u-search-1");
+       Hide("u-search-2");
+       ShowInline("u-button");
+       ShowFlex("u-table");
+
+        
+    }else{
+        alert ("Please enter a valid playlist url");  
     }
    
 }
@@ -25,14 +37,21 @@ var hideId;
 function Hide(hideId) {
     var h = document.getElementById(hideId);
     if (!(h.style.display === "none")) {
-        h.style.display = 'none';
+        h.style.display = "none";
     } 
  }
 
  var showId;
- function Show(showId) {
+ function ShowFlex(showId) {
      var s = document.getElementById(showId);
      if (s.style.display === "none") {
-        s.style.display = 'inherit';
+        s.style.display = "flex";
      }
  }
+
+ function ShowInline(showId) {
+    var s = document.getElementById(showId);
+    if (s.style.display === "none") {
+       s.style.display = "inline-block";
+    }
+}
