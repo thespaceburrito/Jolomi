@@ -9,9 +9,9 @@ var clientAccessToken = {
 async function newClientAccessToken() {
     if(clientAccessToken.lock === true) {
         while(clientAccessToken.lock === true) { await new Promise(r => setTimeout(r, 2)); }    //2ms timeout to save server resources
-        return;                                                                                 // return when whichever call to this function finishes making the token 
+        return; // return when whichever call to this function finishes making the token 
     }
-    clientAccessToken.lock = true;                                                              // exclude our cat from being updated by anything other than this call 
+    clientAccessToken.lock = true; // exclude our cat from being updated by anything other than this call 
     let token = await axios({
         method: 'post',
         url: 'https://accounts.spotify.com/api/token',
