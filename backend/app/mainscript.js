@@ -22,11 +22,11 @@ async function getPlaylistInfo(link) {
 }
 
 
-async function millisToMinutesAndSeconds(millis) {
+function millisToMinutesAndSeconds(millis) {
 	var minutes = Math.floor(millis / 60000);
 	var seconds = ((millis % 60000) / 1000).toFixed(0);
 	return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
-  }
+}
 
 
 
@@ -88,34 +88,54 @@ async function getLink2() {
         let songtemplate = document.querySelector("#songrow");
         
        
-        alert("test: object is created");
-        Array.from(object).forEach(song => {
-            alert("test: enters foreach");
+        // [note from andrew]: Creating an array from the object just creates an array of properties from the one object.
+        //                      The object.songs property already has an array, so we only need to iterate that.
+        // alert("test: object is created");
+        // Array.from(object).forEach(song => {
+        //     alert("test: enters foreach");
+        //     if (song != null) {
+        //         let newItem = songtemplate.content.cloneNode(true);
+        //         //song name and link
+        //         newItem.querySelector("#songrow__name").textContent = object.songs.name;
+        //         newItem.querySelector("#songrow__name").href = object.songs.spotify_url;
+                
+        //         //artist name and link
+        //         artistName = new Array();
+        //         object.songs.artists.forEach(function(data){
+        //             artistName.push(data.name);
+        //         });
+        //         newItem.querySelector("#songrow__artist").textContent = artistName.join(", ");
+        //         newItem.querySelector("#songrow__artist").href = object.songs.artists[0].link;
+
+        //         //song duration in m:ss format
+        //         newItem.querySelector("#songrow__duration").textContent = millisToMinutesAndSeconds(object.songs.duration);
+                
+        //         tbody.appendChild(newItem);
+        //     }
+        // });
+
+        object.songs.forEach(song => {
             if (song != null) {
                 let newItem = songtemplate.content.cloneNode(true);
                 //song name and link
-                newItem.querySelector("#songrow__name").textContent = object.songs.name;
-                newItem.querySelector("#songrow__name").href = object.songs.spotify_url;
+                newItem.querySelector("#songrow__name").textContent = song.name;
+                newItem.querySelector("#songrow__name").href = song.spotify_url;
                 
                 //artist name and link
                 artistName = new Array();
-                object.songs.artists.forEach(function(data){
-                    artistName.push(data.name);
+                song.artists.forEach(data => {
+                    let tmp = `<a href="${data.link}" target="_blank" rel="noopener noreferrer">${data.name}</a>`;
+                    artistName.push(tmp);
                 });
-                newItem.querySelector("#songrow__artist").textContent = artistName.join(", ");
-                newItem.querySelector("#songrow__artist").href = object.songs.artists[0].link;
+                newItem.querySelector("#songrow__artist").innerHTML = artistName.join(", ");
 
                 //song duration in m:ss format
-                newItem.querySelector("#songrow__duration").textContent = millisToMinutesAndSeconds(object.songs.duration);
-                
+                newItem.querySelector("#songrow__duration").textContent = millisToMinutesAndSeconds(song.duration);
                 tbody.appendChild(newItem);
             }
         });
 
-
-
-
-       document.getElementById("fittext1").innerText = "Playlist Name";
+       document.getElementById("fittext1").innerText = object.name;
        ShowFlex("u-search-1");
        Hide("u-search-2");
        ShowInline("u-button");
