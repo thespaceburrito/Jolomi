@@ -88,9 +88,9 @@ async function getLink2() {
         let songtemplate = document.querySelector("#songrow");
         
        
-        alert(object.songs[0].name);
+        alert("test: object is created");
         Array.from(object).forEach(song => {
-            
+            alert("test: enters foreach");
             if (song != null) {
                 let newItem = songtemplate.content.cloneNode(true);
                 //song name and link
