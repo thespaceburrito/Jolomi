@@ -11,6 +11,38 @@ async function getPlaylistInfo(link) {
         headers: { 'Content-Type': 'application/json', }
     });
 
+    if(request.status == '404') {
+        if(link.includes("deezer")) {
+            request = await fetch(`/api/deezerplisrc?link=${link}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json', }
+            });
+            if(request.status != '200') {
+                alert("could not get Deezer Playlist Info");
+                return;
+            }
+            let myPlaylist = await request.json();
+            console.log(myPlaylist);
+
+            request = await fetch(`/api/commonplaylistobject`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', },
+                body: JSON.stringify({ playlist: myPlaylist })
+            });
+            if(request.status != '200') {
+                alert("could not get commonplaylistobject from link");
+                return;
+            }
+        } else {
+            alert("could not get commonplaylistobject from link");
+            return;
+        }
+    }
+
+    request = await fetch(`/api/commonplaylistobject?playlistlink=${link}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', }
+    });
     if(request.status != '200') {
         alert("could not get commonplaylistobject from link");
         return;

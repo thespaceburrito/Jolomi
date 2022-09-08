@@ -2,6 +2,31 @@ const axios = require('axios');
 var express = require('express');
 var router = express.Router();
 
+//Deezer limits API calls to 50/5 seconds, so we need to queue the calls in such a way that they don't exceed 1 call every 100ms
+let apiQueue = [];
+let apiQueueInterval = 100;
+let currentApiQueueItem;
+setInterval(async () => {
+    if(apiQueue.length != 0 && currentApiQueueItem != apiQueue[0]) {
+        currentApiQueueItem = apiQueue[0];
+        try {
+            let call = await axios({
+                method: apiQueue[0].method,
+                url: apiQueue[0].request,
+            });
+            apiQueue[0].response = call.data;
+            console.log(`[DEBUG]: ${apiQueue[0].method} Request to ${apiQueue[0].request} returned ${call.data}`);
+            // console.log(call.data);
+            apiQueue.shift();
+        } catch (err) {
+            apiQueue[0].response = '404'; //TODO: Set to the actual error response
+            apiQueue.shift();
+            return;
+        }
+    }
+}, apiQueueInterval);
+
+
 //client credientials access for fallback
 var clientAccessToken = {
     lock: false                                     // so that we don't attempt to generate more than one client access token at a time
@@ -52,48 +77,92 @@ async function refreshUserAccessToken(refresh_token) {
     }
 }
 
+router.get('/deezerplisrc', async (req, res) => {
+    let dplaylistId = req.query.link.split("/playlist/")[1];
+    let playlistInfoCall = {
+        request: `https://api.deezer.com/playlist/${dplaylistId}`,
+        method: 'GET'
+    };
+    apiQueue.push(playlistInfoCall);
+    await new Promise(waitForPlaylistResponse);
+    if(playlistInfoCall.response.error) {
+        res.sendStatus(404);
+        return;
+    }
+
+    let obj = {
+        url: req.query.link,
+        name: playlistInfoCall.response.title,
+        isrcs: []
+    };
+
+    //  now for each song, push a request to new array songs of requests,
+    let songs = [];
+    playlistInfoCall.response.tracks.data.forEach(song => {
+        let songInfoCall = {
+            request: `https://api.deezer.com/track/${song.id}`,
+            method: 'GET'
+        };
+        songs.push(songInfoCall);
+    }); 
+    //  then push all items in songs to apiQueue
+    songs.forEach(item => {
+        apiQueue.push(item);
+    });
+    //  and await all response from each in songs to != null,
+    await new Promise(waitForAllSongsResponse);
+    //  then harvest the ISRC codes from each response in songs, pushing them one by one into obj.isrcs
+    songs.forEach(item => {
+        obj.isrcs.push(item.response.isrc);
+    });
+
+    res.json(obj);
+
+    function waitForPlaylistResponse(resolve, reject) {
+        if (playlistInfoCall.response != null)
+            resolve();
+        else
+            setTimeout(waitForPlaylistResponse.bind(this, resolve, reject), 30);
+    }
+
+    function waitForAllSongsResponse(resolve, reject) {
+        let nullCt = 0;
+        songs.forEach(item => {
+            if (item.response == null) {
+                nullCt++;
+            }
+        });
+        if (nullCt == 0) {
+            resolve();
+        } else {
+            setTimeout(waitForAllSongsResponse.bind(this, resolve, reject), 60);
+        }
+    }
+});
 
 // GET /api/commonplaylistobject -- accepts query playlistlink=xxxx
-//                                  responds with json body of document
+//                                  responds with json body of document if document exists
 router.get('/commonplaylistobject', async (req, res) => {
     //If playlistlink exists, just return that.
     if(req.query.playlistlink == null) { res.sendStatus(400); return; }
     try {
-        let dbCheck = await req.db.collection("playlists").findOne({ applemusic_url: req.query.playlistlink }, {projection: {_id: 0}});
+        let dbCheck = await req.db.collection("playlists").findOne({ url: req.query.playlistlink }, {projection: {_id: 0}});
         if(dbCheck) {
             res.send(dbCheck);
             return;
-        }
+        } else { res.sendStatus(404); }
     } catch (err) {
         console.log(err);
         res.sendStatus(500);
         return;
     }
+});
 
-    //TODO: Gen array of ISRC codes from apple music playlist
-    let testPlayList = [
-        'GBAYE1001387',
-        'USYAH1300029',
-        'USJ441600101',
-        'QM24S1802715',
-        'GBBRP1549306',
-        'USMRG1140005',
-        'AUUM71800020',
-        'QMF7R1300001',
-        'USCA29300105',
-        'USUM71923111',
-        'GBKPL1663770',
-        'CAUM81700073',
-        'TCACW1749848',
-        'AUAP10900004',
-        'USQX91301053',
-        'GBARL1200767',
-        'AUUM71500886'
-    ];
-
+// POST /api/commonplaylistobject -- accepts body with playlist{url, name, and isrcs[]}
+router.post('/commonplaylistobject', async (req, res) => {
     let newPlaylistDoc = {
-        applemusic_url: "test.com",
-        name: "Road Songs",
+        url: req.body.playlist.url,
+        name: req.body.playlist.name,
         songs: []
     };
 
@@ -121,7 +190,7 @@ router.get('/commonplaylistobject', async (req, res) => {
         at = clientAccessToken.access_token;
     }
 
-    for(var song of testPlayList) {
+    for(var song of req.body.playlist.isrcs) {
         try {
             let search = await axios({
                 method: 'get',
@@ -171,7 +240,7 @@ router.get('/commonplaylistobject', async (req, res) => {
     try {
         let entry = await req.db.collection("playlists").insertOne(newPlaylistDoc);
         if(entry.acknowledged) {
-            res.status(200).send(newPlaylistDoc);
+            res.sendStatus(200);
         } else {
             res.sendStatus(500);
         }

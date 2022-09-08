@@ -1,9 +1,6 @@
 //environment vars
 require('dotenv').config();
 
-//for making api calls
-// const axios = require('axios');
-
 //mongodb connection
 const MongoClient = require('mongodb').MongoClient;
 const connectionString = `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@creativelynamedplaylist.eq6dck7.mongodb.net/?retryWrites=true&w=majority`;
