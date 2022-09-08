@@ -5,21 +5,36 @@ var router = express.Router();
 
 //Deezer limits API calls to 50/5 seconds, so we need to queue the calls in such a way that they don't exceed 1 call every 100ms
 //[Andrew]: 9/8/22 this is a little faster but the requests still are getting made one at a time.
-//              I would like it to skip to the first item not being processed.
-//              MAYBE add a processing: true field to the job objects that are being processed instead of keeping them in an array
 let apiQueue = [];
 let apiQueueInterval = 100;
-let currentApiQueueItems = [];
+let isDispatching = false;
+function promiseIsNotDispatching(resolve, reject) {
+    if (isDispatching == false)
+        resolve();
+    else
+        setTimeout(promiseIsNotDispatching.bind(this, resolve, reject), 30);
+}
+
 setInterval(async () => {
-    if(apiQueue.length == 0) return;
-    // console.log(`[DEBUG]: There are currently ${apiQueue.length} jobs in apiQueue.`);
-    // console.log(`[DEBUG]: There are currently ${currentApiQueueItems.length} jobs in currentApiQueueItems.`);
-    for (job of apiQueue) {
-        if(currentApiQueueItems.includes(job.uuid)) {
+    let apiQueueCopy = [...apiQueue];
+    if(apiQueueCopy.length == 0) {
+        isDispatching = false;
+        return;
+    }
+    // now await that isDispatching is false
+    await new Promise(promiseIsNotDispatching);
+    
+    // if(isDispatching == true) return;
+
+    isDispatching = true;
+    
+    for (job of apiQueueCopy) {
+        if(job.processing) {
             continue;
         }
+        console.log(`[DEBUG]: There are currently ${apiQueue.length} jobs in apiQueue.`);
 
-        currentApiQueueItems.push(job.uuid);
+        job.processing = true;
         try {
             let call = await axios({
                 method: job.method,
@@ -28,27 +43,22 @@ setInterval(async () => {
             job.response = call.data;
             console.log(`[DEBUG]: ${job.method} Request to ${job.request} returned ${call.data}`);
             
+            job.done = true;
             let index = apiQueue.indexOf(job);
             if(index !== -1) {
                 apiQueue.splice(index, 1);
             }
-            index = currentApiQueueItems.indexOf(job.uuid);
-            if(index !== -1) {
-                currentApiQueueItems.splice(index, 1);
-            }
+            break;
         } catch (err) {
             job.response = '500';
+            job.done = true;
             let index = apiQueue.indexOf(job);
             if(index !== -1) {
                 apiQueue.splice(index, 1);
             }
-            index = currentApiQueueItems.indexOf(job);
-            if(index !== -1) {
-                currentApiQueueItems.splice(index, 1);
-            }
-            return;
         }
     }
+    isDispatching = false; // Need to find a better place to put this.
 }, apiQueueInterval);
 
 
@@ -107,7 +117,9 @@ router.get('/deezerplisrc', async (req, res) => {
     let playlistInfoCall = {
         request: `https://api.deezer.com/playlist/${dplaylistId}`,
         method: 'GET',
-        uuid: crypto.randomUUID()
+        uuid: crypto.randomUUID(),
+        processing: false,
+        done: false
     };
     apiQueue.push(playlistInfoCall);
     await new Promise(waitForPlaylistResponse);
@@ -127,7 +139,10 @@ router.get('/deezerplisrc', async (req, res) => {
     playlistInfoCall.response.tracks.data.forEach(song => {
         let songInfoCall = {
             request: `https://api.deezer.com/track/${song.id}`,
-            method: 'GET'
+            method: 'GET',
+            uuid: crypto.randomUUID(),
+            processing: false,
+            done: false
         };
         songs.push(songInfoCall);
     }); 
@@ -145,7 +160,7 @@ router.get('/deezerplisrc', async (req, res) => {
     res.json(obj);
 
     function waitForPlaylistResponse(resolve, reject) {
-        if (playlistInfoCall.response != null)
+        if (playlistInfoCall.done)
             resolve();
         else
             setTimeout(waitForPlaylistResponse.bind(this, resolve, reject), 30);
@@ -154,7 +169,7 @@ router.get('/deezerplisrc', async (req, res) => {
     function waitForAllSongsResponse(resolve, reject) {
         let nullCt = 0;
         songs.forEach(item => {
-            if (item.response == null) {
+            if (item.done == false) {
                 nullCt++;
             }
         });
