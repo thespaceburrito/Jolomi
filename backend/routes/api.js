@@ -1,26 +1,51 @@
-const axios = require('axios');
+var axios = require('axios');
+var crypto = require('crypto');
 var express = require('express');
 var router = express.Router();
 
 //Deezer limits API calls to 50/5 seconds, so we need to queue the calls in such a way that they don't exceed 1 call every 100ms
+//[Andrew]: 9/8/22 this is a little faster but the requests still are getting made one at a time.
+//              I would like it to skip to the first item not being processed.
+//              MAYBE add a processing: true field to the job objects that are being processed instead of keeping them in an array
 let apiQueue = [];
 let apiQueueInterval = 100;
-let currentApiQueueItem;
+let currentApiQueueItems = [];
 setInterval(async () => {
-    if(apiQueue.length != 0 && currentApiQueueItem != apiQueue[0]) {
-        currentApiQueueItem = apiQueue[0];
+    if(apiQueue.length == 0) return;
+    // console.log(`[DEBUG]: There are currently ${apiQueue.length} jobs in apiQueue.`);
+    // console.log(`[DEBUG]: There are currently ${currentApiQueueItems.length} jobs in currentApiQueueItems.`);
+    for (job of apiQueue) {
+        if(currentApiQueueItems.includes(job.uuid)) {
+            continue;
+        }
+
+        currentApiQueueItems.push(job.uuid);
         try {
             let call = await axios({
-                method: apiQueue[0].method,
-                url: apiQueue[0].request,
+                method: job.method,
+                url: job.request,
             });
-            apiQueue[0].response = call.data;
-            console.log(`[DEBUG]: ${apiQueue[0].method} Request to ${apiQueue[0].request} returned ${call.data}`);
-            // console.log(call.data);
-            apiQueue.shift();
+            job.response = call.data;
+            console.log(`[DEBUG]: ${job.method} Request to ${job.request} returned ${call.data}`);
+            
+            let index = apiQueue.indexOf(job);
+            if(index !== -1) {
+                apiQueue.splice(index, 1);
+            }
+            index = currentApiQueueItems.indexOf(job.uuid);
+            if(index !== -1) {
+                currentApiQueueItems.splice(index, 1);
+            }
         } catch (err) {
-            apiQueue[0].response = '404'; //TODO: Set to the actual error response
-            apiQueue.shift();
+            job.response = '500';
+            let index = apiQueue.indexOf(job);
+            if(index !== -1) {
+                apiQueue.splice(index, 1);
+            }
+            index = currentApiQueueItems.indexOf(job);
+            if(index !== -1) {
+                currentApiQueueItems.splice(index, 1);
+            }
             return;
         }
     }
@@ -81,7 +106,8 @@ router.get('/deezerplisrc', async (req, res) => {
     let dplaylistId = req.query.link.split("/playlist/")[1];
     let playlistInfoCall = {
         request: `https://api.deezer.com/playlist/${dplaylistId}`,
-        method: 'GET'
+        method: 'GET',
+        uuid: crypto.randomUUID()
     };
     apiQueue.push(playlistInfoCall);
     await new Promise(waitForPlaylistResponse);
