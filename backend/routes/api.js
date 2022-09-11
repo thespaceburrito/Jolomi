@@ -5,6 +5,8 @@ var router = express.Router();
 
 //Deezer limits API calls to 50/5 seconds, so we need to queue the calls in such a way that they don't exceed 1 call every 100ms
 //[Andrew]: 9/8/22 this is a little faster but the requests still are getting made one at a time.
+//      It looks like there's a race condition.
+//      The strange behavior about this is that it dispatches one job but it marks a different job as processing (I think), and then the job it marks as processing never gets run.
 let apiQueue = [];
 let apiQueueInterval = 100;
 let isDispatching = false;
@@ -23,18 +25,29 @@ setInterval(async () => {
     }
     // now await that isDispatching is false
     await new Promise(promiseIsNotDispatching);
-    
-    // if(isDispatching == true) return;
+    // I think this allows all the waiting calls to go at once, which may be a couple.
+    //  and so, both calls pick up the same job? maybe?
+    //  but if so, then why does it work when I let it run one at a time?
 
+    //
+    //And all this code really does is spawn a new dispatcher every 100ms. It doesn't even actually time the event like I hoped it would.
+    //
+    
     isDispatching = true;
     
     for (job of apiQueueCopy) {
-        if(job.processing) {
+        if(job.processing == true) {
             continue;
         }
         console.log(`[DEBUG]: There are currently ${apiQueue.length} jobs in apiQueue.`);
-
         job.processing = true;
+        
+        let index = apiQueue.indexOf(job);
+        if(index !== -1) {
+            apiQueue.splice(index, 1);
+        }
+        // isDispatching = false; // this doesn't work here for some reason. I'm not sure why.
+        
         try {
             let call = await axios({
                 method: job.method,
@@ -44,18 +57,10 @@ setInterval(async () => {
             console.log(`[DEBUG]: ${job.method} Request to ${job.request} returned ${call.data}`);
             
             job.done = true;
-            let index = apiQueue.indexOf(job);
-            if(index !== -1) {
-                apiQueue.splice(index, 1);
-            }
             break;
         } catch (err) {
             job.response = '500';
             job.done = true;
-            let index = apiQueue.indexOf(job);
-            if(index !== -1) {
-                apiQueue.splice(index, 1);
-            }
         }
     }
     isDispatching = false; // Need to find a better place to put this.
