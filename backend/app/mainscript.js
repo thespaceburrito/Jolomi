@@ -63,7 +63,7 @@ function millisToMinutesAndSeconds(millis) {
 async function addToSpotify() {
     let requestBody = {
         commonplaylistobject: JSON.parse(sessionStorage.getItem('commonplaylistobject')),
-        name: "test playlist",
+        name: JSON.parse(sessionStorage.getItem('commonplaylistobject')).name,
         public: false,
         description: "test of creatively named playlist converter /api/spotifyplaylist endpoint"
     };
@@ -121,6 +121,7 @@ async function getLink2(event, link) {
        ShowFlex("u-search-1");
        Hide("u-search-2");
        ShowInline("u-button");
+       ShowInline("login-button");
        ShowFlex("u-table");
 
        if(document.getElementById("login-button")) {

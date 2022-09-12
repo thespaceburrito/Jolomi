@@ -37,7 +37,7 @@
             async function addToSpotify() {
                 let requestBody = {
                     commonplaylistobject: JSON.parse(sessionStorage.getItem('commonplaylistobject')),
-                    name: "test playlist",
+                    name: JSON.parse(sessionStorage.getItem('commonplaylistobject')).name,
                     public: false,
                     description: "test of creatively named playlist converter /api/spotifyplaylist endpoint"
                 };
@@ -58,7 +58,7 @@
         </script>
 
 
-        <title>Creatively Named Playlist Converter -- backend testing</title>
+        <title>Creatively Named Playlist Converter</title>
     </head>
     <body class="u-body u-xl-mode" data-lang="en">
         You are logged in with spotify.
