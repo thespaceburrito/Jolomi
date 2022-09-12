@@ -65,7 +65,7 @@ async function addToSpotify() {
         commonplaylistobject: JSON.parse(sessionStorage.getItem('commonplaylistobject')),
         name: JSON.parse(sessionStorage.getItem('commonplaylistobject')).name,
         public: false,
-        description: "test of creatively named playlist converter /api/spotifyplaylist endpoint"
+        // description: "test of creatively named playlist converter /api/spotifyplaylist endpoint"
     };
 
     let request = await fetch(`/api/spotifyplaylist`, {
@@ -120,8 +120,14 @@ async function getLink2(event, link) {
        document.getElementById("fittext1").innerText = object.name;
        ShowFlex("u-search-1");
        Hide("u-search-2");
-       ShowInline("u-button");
-       ShowInline("login-button");
+    //    ShowInline("u-button");
+        if(document.getElementById("login-button")) {
+            alert('test');
+            document.getElementById("login-button").style.display = 'inline';
+        }
+        if(document.getElementById("addToSpot")) document.getElementById("addToSpot").style.display = 'inline';
+        // document.getElementById("sec-6525").style = "display: block;";
+    //    ShowInline("login-button");
        ShowFlex("u-table");
 
        if(document.getElementById("login-button")) {

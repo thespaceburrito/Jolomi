@@ -17,12 +17,14 @@
       <!-- <a href="/login">Login With Spotify</a> -->
       <body class="u-body u-xl-mode" data-lang="en">
         <script src="mainscript.js"></script>
-        <script type="text/javascript">
-          const queryString = window.location.search;
-          const urlParams = new URLSearchParams(queryString);
-          if(urlParams.has('link')) {
-            getLink2(null, urlParams.get('link'));
-          }
+        <script type="text/javascript" defer>
+          window.onload = function () {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            if(urlParams.has('link')) {
+              getLink2(null, urlParams.get('link'));
+            }
+          };
         </script>
 
         <header class="u-clearfix u-grey-30 u-header u-header custom-scrollbar" id="sec-c5a4"><div class="u-clearfix u-sheet u-valign-middle-sm u-sheet-1">
@@ -52,11 +54,11 @@
           </form>
 
           <!-- if loggedIn = true, then this button will instead call on the add to spotify method -->
-          <% if (loggedIn) { %>
-            <a href="#" onclick="addToSpotify()" class="u-btn u-btn-round u-button-style u-custom-font u-hover-palette-1-light-1 u-palette-1-base u-radius-26 u-btn-1" id="u-button" style="display: none;">Add Playlist to Spotify</a>
+          <% if (loggedIn === true) { %>
+            <a href="#" onclick="addToSpotify()" class="u-btn u-btn-round u-button-style u-custom-font u-hover-palette-1-light-1 u-palette-1-base u-radius-26 u-btn-1" id="addToSpot" style="display: none;">Add Playlist to Spotify</a>
           <% } else { %>
             <!-- else, login and return here -->
-            <a href="/login" class="u-btn u-btn-round u-button-style u-custom-font u-hover-palette-1-light-1 u-palette-1-base u-radius-26 u-btn-1" id="u-button login-button" style="display: none;">Login with Spotify to Add to Library</a>
+            <a href="/login" class="u-btn u-btn-round u-button-style u-custom-font u-hover-palette-1-light-1 u-palette-1-base u-radius-26 u-btn-1" id="login-button" style="display: none;">Login with Spotify to Add to Library</a>
           <% } %>
         </div>
         <section class="u-align-center u-clearfix u-section-1" id="sec-6525">
