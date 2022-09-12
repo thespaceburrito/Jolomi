@@ -1,150 +1,154 @@
 <!DOCTYPE html>
 <html lang="en-US">
-    <head>        
-        <!-- Metadata for SEO -->
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta charset="utf-8">
-        <meta name="author" content="Andrew Robinson">
-        <meta name="Description" content="Creatively Named Playlist Converter -- backend testing">
 
-        <meta property="og:title" content="Home">
-        <meta property="og:type" content="website">
+<head>
+  <!-- Metadata for SEO -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="author" content="Andrew Robinson">
+  <meta name="Description" content="Creatively Named Playlist Converter -- backend testing">
 
-        <title>Creatively Named Playlist Converter -- backend testing</title>
-        <link rel="stylesheet" href="mainstyle.css" media="screen">
-        <link rel="stylesheet" href="simplestyle.css">
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">     
-        <script>
-            sessionStorage.clear();
+  <meta property="og:title" content="Home">
+  <meta property="og:type" content="website">
 
-            async function getPlaylistInfo() {
-                let link = document.getElementById("link").value;
-                let request = await fetch(`/api/commonplaylistobject?playlistlink=${link}`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json', }
-                });
+  <title>Creatively Named Playlist Converter -- backend testing</title>
+  <link rel="stylesheet" href="mainstyle.css" media="screen">
+  <link rel="stylesheet" href="simplestyle.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
+    integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <script>
+    sessionStorage.clear();
 
-                if(request.status != '200') {
-                    alert("could not get commonplaylistobject from link");
-                    return;
-                }
-                let res = await request.json();
-                document.getElementById('playlistinfo').innerHTML = JSON.stringify(res);
-                sessionStorage.setItem('commonplaylistobject', JSON.stringify(res));
-                document.getElementById('addtospotify').disabled = false;
-            }
+    async function addToSpotify() {
+      let requestBody = {
+        commonplaylistobject: JSON.parse(sessionStorage.getItem('commonplaylistobject')),
+        name: "test playlist",
+        public: false,
+        description: "test of creatively named playlist converter /api/spotifyplaylist endpoint"
+      };
 
-            async function addToSpotify() {
-                let requestBody = {
-                    commonplaylistobject: JSON.parse(sessionStorage.getItem('commonplaylistobject')),
-                    name: "test playlist",
-                    public: false,
-                    description: "test of creatively named playlist converter /api/spotifyplaylist endpoint"
-                };
+      let request = await fetch(`/api/spotifyplaylist`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', },
+        body: JSON.stringify(requestBody)
+      });
 
-                let request = await fetch(`/api/spotifyplaylist`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', },
-                    body: JSON.stringify(requestBody)
-                });
-
-                let res = await request.json();
-                if(res.status != 201) {
-                    alert("An error occurred while adding playlist to your spotify library: " + res);
-                    return;
-                }
-                alert("Successfully added playlist to your spotify account.");                
-            }
-        </script>
+      let res = await request.json();
+      if (res.status != 201) {
+        alert("An error occurred while adding playlist to your spotify library: " + res);
+        return;
+      }
+      alert("Successfully added playlist to your spotify account.");
+    }
+  </script>
 
 
-        <title>Creatively Named Playlist Converter -- backend testing</title>
-    </head>
-    <body class="u-body u-xl-mode" data-lang="en">
-        You are logged in with spotify.
-        <br>
-        Please provide a link to an apple music playlist.
-        <input type="text" id="link" placeholder="Apple music link"/>
-        <input type="button" value="submit" onclick="getPlaylistInfo()">
-        <div id="playlistinfo"></div>
-        <button id="addtospotify" onclick="addToSpotify()" disabled="true">Add to Spotify</button>
-        
+  <title>Creatively Named Playlist Converter -- backend testing</title>
+</head>
+
+<body class="u-body u-xl-mode" data-lang="en">
+
+  <header class="u-clearfix u-grey-30 u-header u-header custom-scrollbar" id="sec-c5a4">
+    <div class="u-clearfix u-sheet u-valign-middle-sm u-sheet-1">
+      <a href="http://localhost:8888/" data-page-id="25215025" class="u-image u-logo u-image-1" data-image-width="183"
+        data-image-height="182" title="Main">
+        <img src="images/Asset6.png" class="u-logo-image u-logo-image-1">
+      </a>
+      <form class="u-radius-26 u-search u-search-right u-white u-search-1 " id="u-search-1" style="display: none;">
+        <button class="u-search-button" type="button" onclick="getLink()">
+          <span class="u-file-icon u-search-icon u-spacing-10 u-search-icon-1">
+            <img src="images/271226.png" alt="">
+          </span>
+        </button>
+        <input class="u-custom-font u-search-input u-search-input-1" id="u-search-input-1" name="search" value=""
+          placeholder="Enter playlist url">
+      </form>
+
+      <p class="u-custom-font u-text u-text-default u-text-1" id="fittext1">
+        Welcome to the <br> Creatively Named Playlist Converter
+      </p>
+      <form class="u-form u-radius-26 u-search u-search-right u-white u-search-2" id="u-search-2">
+        <button class="u-search-button" type="button" onclick="getLink2();">
+          <span class="u-file-icon u-search-icon u-spacing-10 u-search-icon-2">
+            <img src="images/271226.png" alt="">
+          </span>
+        </button>
+        <input class="u-custom-font u-search-input u-search-input-2" id="u-search-input-2" value=""
+          placeholder="Enter playlist url">
+      </form>
+      <a onclick="addToSpotify()"
+        class="u-btn u-btn-round u-button-style u-custom-font u-hover-palette-1-light-1 u-palette-1-base u-radius-26 u-btn-1"
+        id="u-button" style="display: none;">Add to Spotify</a>
+    </div>
+    <section class="u-align-center u-clearfix u-section-1" id="sec-6525">
+      <div class="u-clearfix u-sheet u-sheet-1">
+        <div class="u-expanded-width-sm u-expanded-width-xs u-table u-table-responsive u-table-1" id="u-table"
+          style="display: none;">
+          <table class="u-table-entity u-table-entity-1 ">
+
+            <thead class="u-custom-font u-table-header u-table-header-1">
+              <tr>
+                <th class="u-table-cell u-table-cell-1">Title</th>
+                <th class="u-table-cell u-table-cell-2">Artist</th>
+                <th class="u-table-cell u-table-cell-3" style="text-align: center;"><i class='fas fa-clock'
+                    style='color: white'></i></th>
+              </tr>
+            </thead>
+            <tbody class="u-align-left u-custom-font u-table-body u-table-body-1" id="container__item2_tbody">
 
 
-
-        
-                   <header class="u-clearfix u-grey-30 u-header u-header custom-scrollbar" id="sec-c5a4"><div class="u-clearfix u-sheet u-valign-middle-sm u-sheet-1">
-                <a href="index.ejs" data-page-id="25215025" class="u-image u-logo u-image-1" data-image-width="183" data-image-height="182" title="Main">
-                  <img src="images/Asset6.png" class="u-logo-image u-logo-image-1">
-                </a>
-                <form class="u-radius-26 u-search u-search-right u-white u-search-1 " id="u-search-1" style="display: none;">
-                  <button class="u-search-button" type="button" onclick="getLink()" >
-                    <span class="u-file-icon u-search-icon u-spacing-10 u-search-icon-1">
-                      <img src="images/271226.png" alt="">
-                    </span>
-                  </button>
-                  <input class="u-custom-font u-search-input u-search-input-1" id="u-search-input-1" name="search" value="" placeholder="Enter playlist url">
-                </form>
-          
-                <p class="u-custom-font u-text u-text-default u-text-1" id="fittext1" >
-                  Welcome to the <br> Creatively Named Playlist Converter
-                </p>
-                <form class="u-form u-radius-26 u-search u-search-right u-white u-search-2" id="u-search-2">
-                  <button class="u-search-button" type="button" onclick="getLink2();">
-                    <span cla
-                    ss="u-file-icon u-search-icon u-spacing-10 u-search-icon-2">
-                      <img src="images/271226.png" alt="">
-                    </span>
-                  </button>
-                  <input class="u-custom-font u-search-input u-search-input-2" id="u-search-input-2" value="" placeholder="Enter playlist url">
-                </form>
-                <a href="/login" class="u-btn u-btn-round u-button-style u-custom-font u-hover-palette-1-light-1 u-palette-1-base u-radius-26 u-btn-1" id="u-button" style="display: none;">Login With Spotify</a>
-              </div>
-              <section class="u-align-center u-clearfix u-section-1" id="sec-6525">
-                <div class="u-clearfix u-sheet u-sheet-1">
-                  <div class="u-expanded-width-sm u-expanded-width-xs u-table u-table-responsive u-table-1" id="u-table" style="display: none;">
-                    <table class="u-table-entity u-table-entity-1 ">
-                     
-                      <thead class="u-custom-font u-table-header u-table-header-1">
-                        <tr>
-                          <th class="u-table-cell u-table-cell-1">Title</th>
-                          <th class="u-table-cell u-table-cell-2">Artist</th>
-                          <th class="u-table-cell u-table-cell-3" style="text-align: center;"><i class='fas fa-clock' style='color: white'></i></th>
-                        </tr>
-                      </thead>
-                      <tbody class="u-align-left u-custom-font u-table-body u-table-body-1" id="container__item2_tbody">
-                      
-                        
-                      </tbody>
-                       <!-- template doesn't get rendered, but makes it easier to add elements with DOM -->
-                       <template id="songrow">
-                        <tr>
-                            <td><a id="songrow__name" /></td>
-                            <td><a id="songrow__artist" /></td>
-                            <td id="songrow__duration"></td>
-                        </tr>
-                    </template>
-                    </table>
-                  </div>
-                </div>
-              </section></header>
-              <footer class="u-align-center u-clearfix u-footer u-grey-80 u-footer" id="sec-9bc7"><div class="u-align-left u-clearfix u-sheet u-valign-middle-lg u-valign-middle-md u-valign-middle-sm u-valign-middle-xl u-sheet-1">
-                <span>If you would like to support us, click <span style="text-decoration: underline;">here</span><span>
-              </div></footer>
-            
-            
-        
-            <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-               <script src="jquery.fittext.js"></script>
-              <script type="text/javascript">
-                $("#fittext1").fitText(1.1, { minFontSize: '10px', maxFontSize: '50px' });
-            </script>
-            <script src="mainscript.js"></script>
-        
-          
-       
+            </tbody>
+            <!-- template doesn't get rendered, but makes it easier to add elements with DOM -->
+            <template id="songrow">
+              <tr>
+                <td><a id="songrow__name" /></td>
+                <td><a id="songrow__artist" /></td>
+                <td id="songrow__duration"></td>
+              </tr>
+            </template>
+          </table>
+        </div>
+      </div>
+    </section>
+  </header>
+  <footer class="u-align-center u-clearfix u-footer u-grey-80 u-footer" id="sec-9bc7">
+    <div
+      class="u-align-left u-clearfix u-sheet u-valign-middle-lg u-valign-middle-md u-valign-middle-sm u-valign-middle-xl u-sheet-1">
+      <span>If you would like to support us, click <span style="text-decoration: underline;">here</span><span>
+    </div>
+  </footer>
 
 
 
-    </body>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+  <script src="jquery.fittext.js"></script>
+  <script type="text/javascript">
+    $("#fittext1").fitText(1.1, { minFontSize: '10px', maxFontSize: '50px' });
+
+    const input = document.querySelector('#u-search-input-1')
+    input.onkeydown = (e) => {
+      if (e.keyCode === 13) {
+        e.preventDefault()
+        getLink();
+      }
+    };
+
+    const input2 = document.querySelector('#u-search-input-2')
+    input2.onkeydown = (e) => {
+      if (e.keyCode === 13) {
+        e.preventDefault()
+        getLink2();
+      }
+    };
+
+  </script>
+  <script src="mainscript.js"></script>
+
+
+
+
+
+
+</body>
+
 </html>

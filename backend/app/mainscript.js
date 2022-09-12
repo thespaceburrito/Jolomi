@@ -74,10 +74,59 @@ async function addToSpotify() {
         body: JSON.stringify(requestBody)
     });
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+async function getLink() {
+    let link = document.getElementById("u-search-input-1").value;
+    if (validateLink(document.getElementById("u-search-input-1").value)){
+        await getPlaylistInfo(link);
+        let object = sessionStorage.getItem("commonplaylistobject");
+        object = JSON.parse(object);
+        
+
+        let tbody = document.querySelector("#container__item2_tbody");
+        let songtemplate = document.querySelector("#songrow");
+        
+       
+
+        object.songs.forEach(song => {
+            if (song != null) {
+                let newItem = songtemplate.content.cloneNode(true);
+                //song name and link
+                newItem.querySelector("#songrow__name").textContent = song.name;
+                newItem.querySelector("#songrow__name").href = song.spotify_url;
+                
+                //artist name and link
+                artistName = new Array();
+                song.artists.forEach(data => {
+                    let tmp = `<a href="${data.link}" target="_blank" rel="noopener noreferrer">${data.name}</a>`;
+                    artistName.push(tmp);
+                });
+                newItem.querySelector("#songrow__artist").innerHTML = artistName.join(", ");
+
+                //song duration in m:ss format
+                newItem.querySelector("#songrow__duration").textContent = millisToMinutesAndSeconds(song.duration);
+                tbody.appendChild(newItem);
+            }
+        });
+
+        
+    
+        
+        
+    }else{
+        alert ("Please enter a valid playlist url");  
+=======
+>>>>>>> Stashed changes
     let res = await request.json();
     if(res.status != 201) {
         alert("An error occurred while adding playlist to your spotify library: " + res);
         return;
+<<<<<<< Updated upstream
+=======
+>>>>>>> e07b94653cb72219b577ce989f4a7d5d51845691
+>>>>>>> Stashed changes
     }
     alert("Successfully added playlist to your spotify account.");                
 }
