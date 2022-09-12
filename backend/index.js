@@ -29,11 +29,12 @@ app.use('/api', async (req, res, next) => {
         next();
     }, apiRoute);
 
+
 app.get('/', (req, res) => {
-    if(req.cookies['spot_access_token']) {
-        res.render('logged_in.ejs');
+    if(req.cookies['spot_refresh_token']) {
+        res.render('index.ejs', {loggedIn: true});
     } else {
-        res.render('index.ejs');
+        res.render('index.ejs', {loggedIn: false});
     }
 });
 
