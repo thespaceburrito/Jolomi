@@ -122,7 +122,7 @@ async function getLink2(event, link) {
        Hide("u-search-2");
     //    ShowInline("u-button");
         if(document.getElementById("login-button")) {
-            alert('test');
+            
             document.getElementById("login-button").style.display = 'inline';
         }
         if(document.getElementById("addToSpot")) document.getElementById("addToSpot").style.display = 'inline';

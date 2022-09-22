@@ -33,17 +33,22 @@
   
   .u-section-1 .u-table-header-1 {
     background-image: none;
-    font-family: CirclarStd-Black;
+    font-family: mr-eaves-modern, sans-serif;
+    font-weight: 700;
   }
   
   .u-section-1 .u-table-body-1 {
-    font-family: CircularStd-Light;
+    font-family: mr-eaves-modern, sans-serif;
+    font-weight: 700;
   }
   
   .u-footer{
     background-color: #301934;
     min-height: 50px;
-    font-family: CircularStd-Black;
+    font-family: mr-eaves-modern, sans-serif;
+    font-weight: 800;
+    font-style: normal;
+
   }
   
   
@@ -65,26 +70,9 @@
       margin-left: initial;
       width: auto;
     }
-  }@font-face {
-    font-family: 'CircularStd-Black';
-    font-style: normal;
-    font-weight: 400;
-    src: url(fonts/CircularStd-Black.otf);
-  }@font-face {
-    font-family: 'CircularStd-Book';
-    font-style: normal;
-    font-weight: 400;
-    src: url(fonts/CircularStd-Book.otf);
-  }@font-face {
-    font-family: 'CircularStd-Bold';
-    font-style: normal;
-    font-weight: 400;
-    src: url(fonts/CircularStd-Bold.otf);
   }
   
-  @font-face {
-    font-family: 'CircularStd-Light';
-    font-style: normal;
-    font-weight: 400;
-    src: url(fonts/CircularStd-Light.otf);
-  }
+  
+
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap');
+@import url("https://use.typekit.net/ykr8ccq.css");

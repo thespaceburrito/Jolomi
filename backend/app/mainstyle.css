@@ -16415,60 +16415,7 @@
   .u-word-break {
     word-break: break-all;
   }
-  .u-font-arial.u-custom-font {
-    font-family: Arial, sans-serif !important;
-  }
-  .u-font-courier-new.u-custom-font {
-    font-family: 'Courier New', monospace !important;
-  }
-  .u-font-georgia.u-custom-font {
-    font-family: Georgia, serif !important;
-  }
-  .u-font-roboto.u-custom-font {
-    font-family: Roboto, sans-serif !important;
-  }
-  .u-font-open-sans.u-custom-font {
-    font-family: 'Open Sans', sans-serif !important;
-  }
-  .u-font-lato.u-custom-font {
-    font-family: Lato, sans-serif !important;
-  }
-  .u-font-montserrat.u-custom-font {
-    font-family: Montserrat, sans-serif !important;
-  }
-  .u-font-roboto-condensed.u-custom-font {
-    font-family: 'Roboto Condensed', sans-serif !important;
-  }
-  .u-font-source-sans-pro.u-custom-font {
-    font-family: 'Source Sans Pro', sans-serif !important;
-  }
-  .u-font-oswald.u-custom-font {
-    font-family: Oswald, sans-serif !important;
-  }
-  .u-font-raleway.u-custom-font {
-    font-family: Raleway, sans-serif !important;
-  }
-  .u-font-pt-sans.u-custom-font {
-    font-family: 'PT Sans', sans-serif !important;
-  }
-  .u-font-ubuntu.u-custom-font {
-    font-family: Ubuntu, sans-serif !important;
-  }
-  .u-font-titillium-web.u-custom-font {
-    font-family: 'Titillium Web', sans-serif !important;
-  }
-  .u-font-merriweather.u-custom-font {
-    font-family: Merriweather, serif !important;
-  }
-  .u-font-roboto-slab.u-custom-font {
-    font-family: 'Roboto Slab', serif !important;
-  }
-  .u-font-playfair-display.u-custom-font {
-    font-family: 'Playfair Display', serif !important;
-  }
-  .u-font-lobster.u-custom-font {
-    font-family: Lobster, display !important;
-  }
+  
   .u-rectangle {
     border-radius: 0;
   }
@@ -17185,6 +17132,7 @@
     text-align: left!important;
     word-wrap: normal!important;
     max-width: 800px;
+    min-width: 300px;
     padding: 15px!important;
     color: #fff!important;
   }
@@ -35175,13 +35123,16 @@
   }
   
   .u-header .u-search-input-1 {
-    font-family: CircularStd-Book;
+    font-family: mr-eaves-modern, sans-serif;
+    font-weight: 700;
     font-size: 1rem;
   }
   
   .u-header .u-text-1 {
     font-size: 3rem;
-    font-family: CircularStd-Bold;
+    font-family: mr-eaves-modern, sans-serif;
+    font-weight: 800;
+    font-style: normal;
     margin: 49px auto 33px 93px;
   }
   
@@ -35197,7 +35148,8 @@
   }
   
   .u-header .u-search-input-2 {
-    font-family: CircularStd-Book;
+    font-family: mr-eaves-modern, sans-serif;
+    font-weight: 700;
     font-size: 1rem;
   }
   
@@ -35310,7 +35262,8 @@
     font-size: 1rem;
     letter-spacing: 1px;
     font-weight: 700;
-    font-family: CircularStd-Book;
+    font-family: mr-eaves-modern, sans-serif;
+    font-weight: 700;
     text-transform: none;
     margin: 0 auto 20px 93px;
   }
