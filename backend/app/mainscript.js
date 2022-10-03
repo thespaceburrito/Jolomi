@@ -13,6 +13,10 @@ async function getPlaylistInfo(link) {
 
     if(request.status == '404') {
         if(link.includes("deezer")) {
+            document.getElementById("fittext1").style.opacity = 0;
+            document.getElementById("u-logo-link").style.opacity = 0;
+            Hide("u-search-2"); 
+            init();
             request = await fetch(`/api/deezerplisrc?link=${link}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json', }
@@ -85,6 +89,8 @@ async function addToSpotify() {
 async function getLink2(event, link) {
     if(event != null) event.preventDefault();
 
+   
+    
     sessionStorage.clear('commonplaylistobject');
     if (validateLink(link)){
                 
@@ -117,10 +123,12 @@ async function getLink2(event, link) {
             }
         });
 
+       document.getElementById("fittext1").style.opacity = 1;
+       document.getElementById("u-logo-link").style.opacity = 1;
        document.getElementById("fittext1").innerText = object.name;
        ShowFlex("u-search-1");
-       Hide("u-search-2");
-    //    ShowInline("u-button");
+       Hide("u-search-2"); 
+    
         if(document.getElementById("login-button")) {
             
             document.getElementById("login-button").style.display = 'inline';
@@ -128,6 +136,7 @@ async function getLink2(event, link) {
         if(document.getElementById("addToSpot")) document.getElementById("addToSpot").style.display = 'inline';
         // document.getElementById("sec-6525").style = "display: block;";
     //    ShowInline("login-button");
+        Hide("animation_container");
        ShowFlex("u-table");
 
        if(document.getElementById("login-button")) {

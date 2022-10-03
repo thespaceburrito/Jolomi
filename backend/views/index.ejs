@@ -12,10 +12,58 @@
         <title>Creatively Named Playlist Converter</title>
         <link rel="stylesheet" href="mainstyle.css" media="screen">
         <link rel="stylesheet" href="simplestyle.css">
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">     
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">    
+        <style>
+          #animation_container {
+          position:absolute!important;
+          margin:auto!important;
+          left:0;right:0!important;
+          top:0;bottom:0!important;
+          z-index: 30;
+          }
+        </style> 
+        <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
+        <script src="gif.js?1664473678391"></script>
+        <script>
+        var canvas, stage, exportRoot, anim_container, dom_overlay_container, fnStartAnimation;
+        function init() {
+          canvas = document.getElementById("canvas");
+          anim_container = document.getElementById("animation_container");
+          dom_overlay_container = document.getElementById("dom_overlay_container");
+          var comp=AdobeAn.getComposition("A96F0CFA5056FB4DBAECDD5BF38F5A57");
+          var lib=comp.getLibrary();
+          handleComplete({},comp);
+        }
+        function handleComplete(evt,comp) {
+          //This function is always called, irrespective of the content. You can use the variable "stage" after it is created in token create_stage.
+          var lib=comp.getLibrary();
+          var ss=comp.getSpriteSheet();
+          exportRoot = new lib.Untitled1();
+          stage = new lib.Stage(canvas);	
+          //Registers the "tick" event listener.
+          fnStartAnimation = function() {
+            stage.addChild(exportRoot);
+            createjs.Ticker.framerate = lib.properties.fps;
+            createjs.Ticker.addEventListener("tick", stage);
+          }	    
+          //Code to support hidpi screens and responsive scaling.
+          AdobeAn.makeResponsive(true,'both',false,1,[canvas,anim_container,dom_overlay_container]);	
+          AdobeAn.compositionLoaded(lib.properties.id);
+          fnStartAnimation();
+        }
+        </script>
       </head>
       
-      <body class="u-body u-xl-mode" data-lang="en">
+      <body class="u-body u-xl-mode" data-lang="en" style="margin:0px;">
+
+        <div id="animation_container" style="background-color:rgba(255, 255, 255, 0.00); width:314px; height:181px">
+          <canvas id="canvas" width="314" height="181" style="position: absolute; display: block; background-color:rgba(255, 255, 255, 0.00);"></canvas>
+          <div id="dom_overlay_container" style="pointer-events:none; overflow:hidden; width:314px; height:181px; position: absolute; left: 0px; top: 0px; display: block;">
+          </div>
+        </div>  
+        
+
+           
         <script src="mainscript.js"></script>
         <script type="text/javascript" defer>
           window.onload = function () {
@@ -26,10 +74,11 @@
             }
           };
         </script>
-
+      
         <header class="u-clearfix u-grey-30 u-header u-header custom-scrollbar" id="sec-c5a4"><div class="u-clearfix u-sheet u-valign-middle-sm u-sheet-1">
-          <a href="/" data-page-id="25215025" class="u-image u-logo u-image-1" data-image-width="183" data-image-height="182" title="Main">
-            <img src="images/Asset6.png" class="u-logo-image u-logo-image-1">
+          
+          <a href="/" data-page-id="25215025"  class="u-image u-logo u-image-1" data-image-width="183" data-image-height="182" title="Main">
+            <img src="images/Asset6.png" class="u-logo-image u-logo-image-1" id="u-logo-link">
           </a>
           <form action="javascript:void(0);" onsubmit="getlink2(event, this); return false;" class="u-radius-26 u-search u-search-right u-white u-search-1 " id="u-search-1" style="display: none;">
             <button class="u-search-button" type="submit" onclick="getLink2(event, this.parentElement.elements.search.value);" >
