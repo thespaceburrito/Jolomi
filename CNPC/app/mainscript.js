@@ -97,10 +97,11 @@ async function getLink2(event, link) {
         await getPlaylistInfo(link);
         let object = sessionStorage.getItem("commonplaylistobject");
         object = JSON.parse(object);
-        
+	        
 
         let tbody = document.querySelector("#container__item2_tbody");
         let songtemplate = document.querySelector("#songrow");
+	tbody.innerHTML = '';
 
         object.songs.forEach(song => {
             if (song != null) {
