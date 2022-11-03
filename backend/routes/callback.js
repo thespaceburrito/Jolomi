@@ -39,7 +39,7 @@ router.get('/', async (req, res) => {
             //decode state object and get state.state
             redirect = JSON.parse(Buffer.from(state, 'base64').toString('ascii')).state;
             if(redirect) {
-                res.redirect(`/${redirect}`);
+                res.redirect(`/?link=${redirect}`);
             } else {
                 res.redirect('/');
             }

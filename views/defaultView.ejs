@@ -1,58 +1,86 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <link rel="stylesheet" type="text/css" href="AlphaFrontEnd.css">
-    </head>
-    <body>
-        
-        <div class="container">
-            
-            <div class="container__item" id="container__item" >
-                <form class="form">
-                    <input type="url" class="form__field" id="form__field" placeholder="Paste Playlist Link Here" />
-                    <button type="button" class="btn btn--primary btn--inside uppercase" onclick="getLink();">Send</button>
-              
-                    <p id="error"></p>
-                </form>
-            </div>
-
-            <div class="loader" id="loader" style="display: none;">
-                <div class="inner one"></div>
-                <div class="inner two"></div>
-                <div class="inner three"></div>
-            </div>
-
-            <!-- template doesn't get rendered, but makes it easier to add elements with DOM -->
-            <template id="songrow">
+<html style="font-size: 16px;" lang="en"><head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <title>Home</title>
+    <link rel="stylesheet" href="main.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="AlphaFrontEnd.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">     
+    <meta name="theme-color" content="#478ac9">
+    <meta property="og:title" content="Home">
+    <meta property="og:type" content="website">
+  </head>
+  <body class="u-body u-xl-mode" data-lang="en">
+    <header class="u-clearfix u-grey-30 u-header u-header custom-scrollbar" id="sec-c5a4"><div class="u-clearfix u-sheet u-valign-middle-sm u-sheet-1">
+        <a href="http://localhost:8888/" data-page-id="25215025" class="u-image u-logo u-image-1" data-image-width="183" data-image-height="182" title="Main">
+          <img src="images/Asset6.png" class="u-logo-image u-logo-image-1">
+        </a>
+        <form class="u-radius-26 u-search u-search-right u-white u-search-1 " id="u-search-1" style="display: none;">
+          <button class="u-search-button" type="button" onclick="getLink()" >
+            <span class="u-file-icon u-search-icon u-spacing-10 u-search-icon-1">
+              <img src="images/271226.png" alt="">
+            </span>
+          </button>
+          <input class="u-custom-font u-search-input u-search-input-1" id="u-search-input-1" name="search" value="" placeholder="Enter playlist url">
+        </form>
+  
+        <p class="u-custom-font u-text u-text-default u-text-1" id="fittext1" >
+          Welcome to the <br> Creatively Named Playlist Converter
+        </p>
+        <form class="u-form u-radius-26 u-search u-search-right u-white u-search-2" id="u-search-2">
+          <button class="u-search-button" type="button" onclick="getLink2();">
+            <span class="u-file-icon u-search-icon u-spacing-10 u-search-icon-2">
+              <img src="images/271226.png" alt="">
+            </span>
+          </button>
+          <input class="u-custom-font u-search-input u-search-input-2" id="u-search-input-2" value="" placeholder="Enter playlist url">
+        </form>
+        <a href="" class="u-btn u-btn-round u-button-style u-custom-font u-hover-palette-1-light-1 u-palette-1-base u-radius-26 u-btn-1" id="u-button" style="display: none;">Add Playlist to Spotify</a>
+      </div>
+      <section class="u-align-center u-clearfix u-section-1" id="sec-6525">
+        <div class="u-clearfix u-sheet u-sheet-1">
+          <div class="u-expanded-width-sm u-expanded-width-xs u-table u-table-responsive u-table-1" id="u-table" style="display: none;">
+            <table class="u-table-entity u-table-entity-1 ">
+             
+              <thead class="u-custom-font u-table-header u-table-header-1">
                 <tr>
-                    <td><a id="songrow__name"/></td>
-                    <td><a id="songrow__artist"/></td>
+                  <th class="u-table-cell u-table-cell-1">Title</th>
+                  <th class="u-table-cell u-table-cell-2">Artist</th>
+                  <th class="u-table-cell u-table-cell-3" style="text-align: right;"><i class='fas fa-clock' style='color: white'></i></th>
+                </tr>
+              </thead>
+              <tbody class="u-align-left u-custom-font u-table-body u-table-body-1" id="container__item2_tbody">
+              
+                
+              </tbody>
+               <!-- template doesn't get rendered, but makes it easier to add elements with DOM -->
+               <template id="songrow">
+                <tr>
+                    <td><a id="songrow__name" /></td>
+                    <td><a id="songrow__artist" /></td>
                     <td id="songrow__duration"></td>
                 </tr>
             </template>
-
-            <div class="container__item2 custom-scrollbar" id="container__item2" style="overflow-x:auto; display: none;">
-                <table class="blue" style="width: 100%;">
-                    <thead>
-                        <tr>
-                            <th>Track</th>
-                            <th>Artist</th>
-                            <th>Time</th>
-                        </tr>
-                    </thead>
-                    <tbody id="container__item2_tbody">
-                                  
-                    </tbody>
-                </table>
-            </div>
-          
-            <div class="container__item container__item--bottom">
-          
-            </div>
+            </table>
+          </div>
         </div>
-    </body>
+      </section></header>
+      <footer class="u-align-center u-clearfix u-footer u-grey-80 u-footer" id="sec-9bc7"><div class="u-align-left u-clearfix u-sheet u-valign-middle-lg u-valign-middle-md u-valign-middle-sm u-valign-middle-xl u-sheet-1">
+        <span>If you would like to support us, click <a style="text-decoration: underline;  cursor: pointer;">here</a><span>
+      </div></footer>
+    
+    
 
-    <script src = "AlphaFrontEnd.js"></script>
-    <script src = "PlaylistData.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+ 	  <script src="jquery.fittext.js"></script>
+	  <script type="text/javascript">
+		$("#fittext1").fitText(1.1, { minFontSize: '10px', maxFontSize: '40px' });
+    </script>
+    <script src="PlaylistData.js"></script>
+    <script src="AlphaFrontEnd.js"></script>
+   
 
-</html>
+  
+</body></html>

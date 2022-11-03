@@ -1,9 +1,6 @@
 //environment vars
 require('dotenv').config();
 
-//for making api calls
-// const axios = require('axios');
-
 //mongodb connection
 const MongoClient = require('mongodb').MongoClient;
 const connectionString = `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@creativelynamedplaylist.eq6dck7.mongodb.net/?retryWrites=true&w=majority`;
@@ -32,11 +29,12 @@ app.use('/api', async (req, res, next) => {
         next();
     }, apiRoute);
 
+
 app.get('/', (req, res) => {
-    if(req.cookies['spot_access_token']) {
-        res.render('logged_in.ejs');
+    if(req.cookies['spot_refresh_token']) {
+        res.render('index.ejs', {loggedIn: true});
     } else {
-        res.render('index.ejs');
+        res.render('index.ejs', {loggedIn: false});
     }
 });
 

@@ -1,6 +1,71 @@
-const axios = require('axios');
+var axios = require('axios');
+var crypto = require('crypto');
 var express = require('express');
 var router = express.Router();
+
+//Deezer limits API calls to 50/5 seconds, so we need to queue the calls in such a way that they don't exceed 1 call every 100ms
+//[Andrew]: 9/8/22 this is a little faster but the requests still are getting made one at a time.
+//      It looks like there's a race condition.
+//      The strange behavior about this is that it dispatches one job but it marks a different job as processing (I think), and then the job it marks as processing never gets run.
+let apiQueue = [];
+let apiQueueInterval = 100;
+let isDispatching = false;
+function promiseIsNotDispatching(resolve, reject) {
+    if (isDispatching == false)
+        resolve();
+    else
+        setTimeout(promiseIsNotDispatching.bind(this, resolve, reject), 30);
+}
+
+setInterval(async () => {
+    let apiQueueCopy = [...apiQueue];
+    if(apiQueueCopy.length == 0) {
+        isDispatching = false;
+        return;
+    }
+    // now await that isDispatching is false
+    await new Promise(promiseIsNotDispatching);
+    // I think this allows all the waiting calls to go at once, which may be a couple.
+    //  and so, both calls pick up the same job? maybe?
+    //  but if so, then why does it work when I let it run one at a time?
+
+    //
+    //And all this code really does is spawn a new dispatcher every 100ms. It doesn't even actually time the event like I hoped it would.
+    //
+    
+    isDispatching = true;
+    
+    for (job of apiQueueCopy) {
+        if(job.processing == true) {
+            continue;
+        }
+        console.log(`[DEBUG]: There are currently ${apiQueue.length} jobs in apiQueue.`);
+        job.processing = true;
+        
+        let index = apiQueue.indexOf(job);
+        if(index !== -1) {
+            apiQueue.splice(index, 1);
+        }
+        // isDispatching = false; // this doesn't work here for some reason. I'm not sure why.
+        
+        try {
+            let call = await axios({
+                method: job.method,
+                url: job.request,
+            });
+            job.response = call.data;
+            console.log(`[DEBUG]: ${job.method} Request to ${job.request} returned ${call.data}`);
+            
+            job.done = true;
+            break;
+        } catch (err) {
+            job.response = '500';
+            job.done = true;
+        }
+    }
+    isDispatching = false; // Need to find a better place to put this.
+}, apiQueueInterval);
+
 
 //client credientials access for fallback
 var clientAccessToken = {
@@ -52,48 +117,98 @@ async function refreshUserAccessToken(refresh_token) {
     }
 }
 
+router.get('/deezerplisrc', async (req, res) => {
+    let dplaylistId = req.query.link.split("/playlist/")[1];
+    let playlistInfoCall = {
+        request: `https://api.deezer.com/playlist/${dplaylistId}`,
+        method: 'GET',
+        uuid: crypto.randomUUID(),
+        processing: false,
+        done: false
+    };
+    apiQueue.push(playlistInfoCall);
+    await new Promise(waitForPlaylistResponse);
+    if(playlistInfoCall.response.error) {
+        res.sendStatus(404);
+        return;
+    }
+
+    let obj = {
+        url: req.query.link,
+        name: playlistInfoCall.response.title,
+        isrcs: []
+    };
+
+    //  now for each song, push a request to new array songs of requests,
+    let songs = [];
+    playlistInfoCall.response.tracks.data.forEach(song => {
+        let songInfoCall = {
+            request: `https://api.deezer.com/track/${song.id}`,
+            method: 'GET',
+            uuid: crypto.randomUUID(),
+            processing: false,
+            done: false
+        };
+        songs.push(songInfoCall);
+    }); 
+    //  then push all items in songs to apiQueue
+    songs.forEach(item => {
+        apiQueue.push(item);
+    });
+    //  and await all response from each in songs to != null,
+    await new Promise(waitForAllSongsResponse);
+    //  then harvest the ISRC codes from each response in songs, pushing them one by one into obj.isrcs
+    songs.forEach(item => {
+        obj.isrcs.push(item.response.isrc);
+    });
+
+    res.json(obj);
+
+    function waitForPlaylistResponse(resolve, reject) {
+        if (playlistInfoCall.done)
+            resolve();
+        else
+            setTimeout(waitForPlaylistResponse.bind(this, resolve, reject), 30);
+    }
+
+    function waitForAllSongsResponse(resolve, reject) {
+        let nullCt = 0;
+        songs.forEach(item => {
+            if (item.done == false) {
+                nullCt++;
+            }
+        });
+        if (nullCt == 0) {
+            resolve();
+        } else {
+            setTimeout(waitForAllSongsResponse.bind(this, resolve, reject), 60);
+        }
+    }
+});
 
 // GET /api/commonplaylistobject -- accepts query playlistlink=xxxx
-//                                  responds with json body of document
+//                                  responds with json body of document if document exists
 router.get('/commonplaylistobject', async (req, res) => {
     //If playlistlink exists, just return that.
     if(req.query.playlistlink == null) { res.sendStatus(400); return; }
     try {
-        let dbCheck = await req.db.collection("playlists").findOne({ applemusic_url: req.query.playlistlink }, {projection: {_id: 0}});
+        let dbCheck = await req.db.collection("playlists").findOne({ url: req.query.playlistlink }, {projection: {_id: 0}});
         if(dbCheck) {
             res.send(dbCheck);
             return;
-        }
+        } else { res.sendStatus(404); }
     } catch (err) {
         console.log(err);
         res.sendStatus(500);
         return;
     }
+});
 
-    //TODO: Gen array of ISRC codes from apple music playlist
-    let testPlayList = [
-        'GBAYE1001387',
-        'USYAH1300029',
-        'USJ441600101',
-        'QM24S1802715',
-        'GBBRP1549306',
-        'USMRG1140005',
-        'AUUM71800020',
-        'QMF7R1300001',
-        'USCA29300105',
-        'USUM71923111',
-        'GBKPL1663770',
-        'CAUM81700073',
-        'TCACW1749848',
-        'AUAP10900004',
-        'USQX91301053',
-        'GBARL1200767',
-        'AUUM71500886'
-    ];
-
+// POST /api/commonplaylistobject -- accepts body with playlist{url, name, and isrcs[]}
+router.post('/commonplaylistobject', async (req, res) => {
     let newPlaylistDoc = {
-        applemusic_url: "test.com",
-        name: "Road Songs",
+        url: req.body.playlist.url,
+        name: req.body.playlist.name,
         songs: []
     };
 
@@ -121,7 +236,7 @@ router.get('/commonplaylistobject', async (req, res) => {
         at = clientAccessToken.access_token;
     }
 
-    for(var song of testPlayList) {
+    for(var song of req.body.playlist.isrcs) {
         try {
             let search = await axios({
                 method: 'get',
@@ -171,7 +286,7 @@ router.get('/commonplaylistobject', async (req, res) => {
     try {
         let entry = await req.db.collection("playlists").insertOne(newPlaylistDoc);
         if(entry.acknowledged) {
-            res.status(200).send(newPlaylistDoc);
+            res.sendStatus(200);
         } else {
             res.sendStatus(500);
         }
