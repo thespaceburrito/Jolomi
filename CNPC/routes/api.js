@@ -136,6 +136,7 @@ router.get('/deezerplisrc', async (req, res) => {
     let obj = {
         url: req.query.link,
         name: playlistInfoCall.response.title,
+        checksum: playlistInfoCall.response.checksum,
         isrcs: []
     };
 
@@ -191,16 +192,49 @@ router.get('/deezerplisrc', async (req, res) => {
 router.get('/commonplaylistobject', async (req, res) => {
     //If playlistlink exists, just return that.
     if(req.query.playlistlink == null) { res.sendStatus(400); return; }
+    let playlistInfoCall;
     try {
         let dbCheck = await req.db.collection("playlists").findOne({ url: req.query.playlistlink }, {projection: {_id: 0}});
         if(dbCheck) {
-            res.send(dbCheck);
-            return;
+	    if(dbCheck.checksum) {
+		    //CHECK checksum for change between here and deezer
+		    let dplaylistId = req.query.playlistlink.split("/playlist/")[1];
+		    playlistInfoCall = {
+			request: `https://api.deezer.com/playlist/${dplaylistId}`,
+			method: 'GET',
+			uuid: crypto.randomUUID(),
+			processing: false,
+			done: false
+		    };
+		    apiQueue.push(playlistInfoCall);
+		    await new Promise(waitForPlaylistResponse);
+		    if(playlistInfoCall.response.error) {
+			res.sendStatus(404);
+			return;
+		    }
+
+		    if(playlistInfoCall.response.checksum == dbCheck.checksum) {
+			    res.send(dbCheck);
+			    return;
+		    } else {
+		    	//DELETE all from db where url = req.query.playlistlink
+		    	let delExisting = await req.db.collection("playlists").deleteMany({ url: req.query.playlistlink });
+		    	console.log(delExisting);
+		    }
+	    }
+	    res.sendStatus(404);
         } else { res.sendStatus(404); }
     } catch (err) {
         console.log(err);
         res.sendStatus(500);
         return;
+    }
+    
+    function waitForPlaylistResponse(resolve, reject) {
+        if (playlistInfoCall.done)
+            resolve();
+        else
+            setTimeout(waitForPlaylistResponse.bind(this, resolve, reject), 30);
     }
 });
 
@@ -209,6 +243,7 @@ router.post('/commonplaylistobject', async (req, res) => {
     let newPlaylistDoc = {
         url: req.body.playlist.url,
         name: req.body.playlist.name,
+        checksum: req.body.playlist.checksum,
         songs: []
     };
 
