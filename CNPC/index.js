@@ -38,7 +38,7 @@ app.get('/', (req, res) => {
     }
 });
 
-app.listen(8888, async () => {
+app.listen(80, async () => {
     try {
         await client.connect();
         console.log("Successfully connected to database"); 
