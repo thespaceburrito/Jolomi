@@ -5,6 +5,7 @@
   
   .u-header {
     background-color: #181818!important;
+    z-index: -1;
   }
   
  
