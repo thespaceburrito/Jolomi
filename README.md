@@ -4,7 +4,8 @@ This is a web app that enables the transferring of playlist between different mu
 
 ### Prerequisites
 
-Requirements for the software and other tools to build, test and push 
+Requirements for the software and other tools to build, test and push
+
 - Node.js
 - Git Bash
 
@@ -16,21 +17,28 @@ To start, download project zip folder and after downloading the zip folder, doub
 
 Open the root project directory in Git Bash terminal.
 
-Install npm
+Install npm packages
 
     npm install
-    
+
+Setup .env with your Spotify API key and MongoDB Connection String
+
+    Create new file .env with contents
+    SPOTIFY_CLIENT_ID="your Spotify api Client ID"
+    SPOTIFY_CLIENT_SECRET="your Spotify api secret"
+    MONGODB_CONNECTION_STR="your MongoDB Cluster connection string"
+
 Run npm
 
     npm start
-    
-run index.js 
+
+run index.js
 
     node index.js
 
-view app in a web browser at port 8888
+view app in a web browser at port 80
 
-    https://localhost:8888
+    https://localhost:80
 
 ## Deployment
 
@@ -38,4 +46,4 @@ To be deployed as a web app. Currently hosted at http://cn-pc.tech/
 
 ## Authors
 
-  **Andrew Robinsion** - **Jonathan Obi**
+**Jonathan Obi** - **Andrew Robinsion**

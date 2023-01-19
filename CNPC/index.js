@@ -3,7 +3,7 @@ require('dotenv').config();
 
 //mongodb connection
 const MongoClient = require('mongodb').MongoClient;
-const connectionString = `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@creativelynamedplaylist.eq6dck7.mongodb.net/?retryWrites=true&w=majority`;
+const connectionString = process.env.MONGODB_CONNECTION_STR;
 const client = new MongoClient(connectionString, { useNewUrlParser: true, useUnifiedTopology: true });
 var db;
 
@@ -46,5 +46,5 @@ app.listen(80, async () => {
     } catch (error) {
         console.log(error);
     }
-    console.log("Listening to requests on port 8888...");
+    console.log("Listening to requests on port 80...");
 });
