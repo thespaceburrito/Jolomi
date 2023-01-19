@@ -8,6 +8,7 @@ Requirements for the software and other tools to build, test and push
 
 - Node.js
 - Git Bash
+- MongoDB cluster with database named 'cnpcDB' and collection named 'playlists'
 
 ## How To Use
 
