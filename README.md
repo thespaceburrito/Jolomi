@@ -23,7 +23,8 @@ Install npm packages
 
 Setup .env with your Spotify API key and MongoDB Connection String
 
-    Create new file .env with contents
+Create new file .env with contents
+
     SPOTIFY_CLIENT_ID="your Spotify api Client ID"
     SPOTIFY_CLIENT_SECRET="your Spotify api secret"
     MONGODB_CONNECTION_STR="your MongoDB Cluster connection string"
