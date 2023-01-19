@@ -1,4 +1,4 @@
-# Creatively-Named-Playlist-Converter
+## Project Overview
 
 This is a web app that enables the transferring of playlist between different music streaming platforms. The app can currently transfer playlist from Deezer to Spotify.
 
@@ -8,22 +8,29 @@ Requirements for the software and other tools to build, test and push
 - Node.js
 - Git Bash
 
+## How To Use
+
+To start, download project zip folder and after downloading the zip folder, double click it to uncompress it and access the contents of this project. Use your preffered source-code editor to view the contents.
+
 ### Installing
 
-A step by step series of examples that tell you how to get a development
-environment running
+Open the root project directory in Git Bash terminal.
 
-install npm on Git Bash Terminal
+Install npm
 
     npm install
     
-run index.js on Git Bash Terminal
+Run npm
+
+    npm start
+    
+run index.js 
 
     node index.js
 
-view app in a web browser at
+view app in a web browser at port 8888
 
-    http://cn-pc.tech
+    https://localhost:8888
 
 ## Deployment
 
