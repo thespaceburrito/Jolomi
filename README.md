@@ -21,8 +21,6 @@ Install npm packages
 
     npm install
 
-Setup .env with your Spotify API key and MongoDB Connection String
-
 Create new file .env with contents
 
     SPOTIFY_CLIENT_ID="your Spotify api Client ID"
@@ -47,4 +45,4 @@ To be deployed as a web app. Currently hosted at http://cn-pc.tech/
 
 ## Authors
 
-**Jonathan Obi** - **Andrew Robinsion**
+**Jonathan Obi** - **Andrew Robinson**
