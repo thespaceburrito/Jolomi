@@ -32,10 +32,6 @@ Run npm
 
     npm start
 
-run index.js
-
-    node index.js
-
 view app in a web browser at port 80
 
     https://localhost:80
