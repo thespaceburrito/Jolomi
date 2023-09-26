@@ -38,9 +38,8 @@ view app in a web browser at port 80
 
 ## Deployment
 
-To be deployed as a web app. Currently hosted at http://cn-pc.tech/
+To be deployed as a web app.
 
-*had to revoke api key to make repository public, web app deployment will be back to working status on 1/21/2023*
 
 ## Authors
 
